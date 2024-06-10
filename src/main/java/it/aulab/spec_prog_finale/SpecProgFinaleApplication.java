@@ -19,6 +19,7 @@ public class SpecProgFinaleApplication {
 		return new BCryptPasswordEncoder();
 	}
 
+	
 	@Bean
 	public ModelMapper instanceModelMapper(){
 		ModelMapper mapper = new ModelMapper();
