@@ -5,5 +5,5 @@ import org.springframework.data.repository.ListCrudRepository;
 import it.aulab.spec_prog_finale.models.Article;
 
 public interface ArticleRepository extends ListCrudRepository<Article, Long>{
-    
+    // String findByNameAndEmail(String name, String email);
 }
