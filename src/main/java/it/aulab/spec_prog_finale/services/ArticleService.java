@@ -26,13 +26,9 @@ import it.aulab.spec_prog_finale.utils.StringManipulation;
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Service;
 import org.springframework.security.core.Authentication;
 
-import it.aulab.spec_prog_finale.dtos.ArticleDto;
-import it.aulab.spec_prog_finale.models.Article;
 import it.aulab.spec_prog_finale.models.User;
-import it.aulab.spec_prog_finale.repositories.ArticleRepository;
 import it.aulab.spec_prog_finale.repositories.UserRepository;
 
 @Service
@@ -83,9 +79,15 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long>{
         }
     }
 
-    @Override
-    public ArticleDto create(Article model, MultipartFile file) {
+    public ArticleDto create(Article model, Principal principal, MultipartFile file) {
         String urlImage="";
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            User user = (userRepository.findById(userDetails.getId())).get();
+            model.setUser(user);
+        }
+
         try {
             urlImage = uploadImage(file);
         } catch (Exception e) {
@@ -95,16 +97,6 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long>{
         urlImage = urlImage.replace(supabaseBucket, supabaseImage);
         imageRepository.save(Image.builder().path(urlImage).article(model).build());
         return dto;
-    }
-
-    public ArticleDto create(Article model, Principal principal) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            User user = (userRepository.findById(userDetails.getId())).get();
-            model.setUser(user);
-        }
-        return modelMapper.map(articleRepository.save(model), ArticleDto.class);
     }
 
     @Override

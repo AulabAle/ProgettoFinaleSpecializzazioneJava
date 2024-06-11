@@ -50,13 +50,7 @@ public class CategoryService implements CrudService<CategoryDto, Category, Long>
     }
 
     @Override
-    public CategoryDto create(Category model, MultipartFile file) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
-    }
-
-    @Override
-    public CategoryDto create(Category model, Principal principal) {
+    public CategoryDto create(Category model, Principal principal, MultipartFile file) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }

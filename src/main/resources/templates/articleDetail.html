@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
     <head th:insert="~{index :: head}"></head>
     <body>
+        <head th:insert="~{index :: navbar}"></head>
         <div class="container-fluid p-5 bg-secondary-subtle text-center">
             <div class="row justify-content-center">
                 <div class="col-12">
@@ -45,9 +46,14 @@
                             <p class="fs-5" th:if="${article.category == null}">Nessuna categoria</p>
 
 
-                        <!-- <div class="text-muted my-3">
-                            <p>Redatto il <p th:text="${article.publishDate}">data</p> da <a class="text-muted" href="#"> <p th:text="${article.user.name}"></p>User</a></p>
-                        </div> -->
+                        <div class="text-muted my-3">
+                            <p>Redatto il <p th:text="${article.publishDate}">data</p> da 
+                                <a class="text-muted" href="#"> 
+                                    <p th:text="${article.user.username}">User</p>
+                                </a>
+                            </p>
+                        </div>
+
                     </div>
                     <hr>
                     <p th:text="${article.body}"></p>
@@ -59,38 +65,6 @@
             </div>
         </div>
 
-        <!-- <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-12 col-md-6">
-                    <div class="card" style="width: 18rem;">
-                        <div id="carouselExample" class="carousel slide">
-                            <div class="carousel-inner">
-                                <div class="carousel-item active">
-                                    <img th:src="${article.image.path}" class="card-img-top" alt="...">
-                                </div>
-                            </div>
-                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
-                              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                              <span class="visually-hidden">Previous</span>
-                            </button>
-                            <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
-                              <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                              <span class="visually-hidden">Next</span>
-                            </button>
-                        </div>
-
-                        <div class="card-body">
-                          <h5 class="card-title" th:text="${article.title}"></h5>
-                          <p class="card-text" th:text="${article.subtitle}"></p>
-                          <p class="card-text" th:text="${article.body}"></p>
-
-                          <a th:href="@{/articles}" class="btn btn-primary">Torna indietro</a>
-                        </div>
-                      </div>
-                </div>
-            </div>
-          </div> -->
-
-          <script th:replace="~{index :: bootstrapScript}"></script>
+        <script th:replace="~{index :: bootstrapScript}"></script>
     </body>
 </html>

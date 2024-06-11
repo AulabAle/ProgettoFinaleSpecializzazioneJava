@@ -1,6 +1,9 @@
 package it.aulab.spec_prog_finale.controllers;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -18,8 +21,6 @@ import it.aulab.spec_prog_finale.dtos.ArticleDto;
 import it.aulab.spec_prog_finale.dtos.CategoryDto;
 import it.aulab.spec_prog_finale.models.Article;
 import it.aulab.spec_prog_finale.models.Category;
-import it.aulab.spec_prog_finale.services.ArticleService;
-import it.aulab.spec_prog_finale.services.CategoryService;
 import it.aulab.spec_prog_finale.services.CrudService;
 
 @Controller
@@ -37,7 +38,10 @@ public class ArticleController {
     @GetMapping
     public String articlesIndex(Model viewModel) {
         viewModel.addAttribute("title", "Tutti gli articoli");
-        viewModel.addAttribute("articles", articleService.readAll());
+        //viewModel.addAttribute("articles", articleService.readAll());
+        List<ArticleDto> articles = articleService.readAll();
+        Collections.sort(articles, Comparator.comparing(ArticleDto::getPublishDate).reversed());
+        viewModel.addAttribute("articles", articles);
         return "articles";
     }
 
@@ -49,14 +53,10 @@ public class ArticleController {
         viewModel.addAttribute("categories", categoryService.readAll());
         return "createArticle";
     }
-    
-    // @PostMapping
-    // public String articleStore(@ModelAttribute("article") Article article, RedirectAttributes redirectAttributes, MultipartFile file) {
-    //     articleService.create(article , file);
-    // }
 
-    public String articleStore(@ModelAttribute("article") Article article, RedirectAttributes redirectAttributes, Principal principal) {
-        articleService.create(article, principal);
+    @PostMapping
+    public String articleStore(@ModelAttribute("article") Article article, RedirectAttributes redirectAttributes, Principal principal, MultipartFile file) {
+        articleService.create(article, principal, file);
         redirectAttributes.addFlashAttribute("successMessage", "Articolo aggiunto con successo!");
         return "redirect:/articles"; 
     }
