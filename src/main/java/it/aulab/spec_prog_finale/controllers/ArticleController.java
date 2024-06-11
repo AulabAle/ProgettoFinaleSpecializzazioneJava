@@ -1,5 +1,7 @@
 package it.aulab.spec_prog_finale.controllers;
 
+import java.security.Principal;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -48,9 +50,13 @@ public class ArticleController {
         return "createArticle";
     }
     
-    @PostMapping
-    public String articleStore(@ModelAttribute("article") Article article, RedirectAttributes redirectAttributes, MultipartFile file) {
-        articleService.create(article , file);
+    // @PostMapping
+    // public String articleStore(@ModelAttribute("article") Article article, RedirectAttributes redirectAttributes, MultipartFile file) {
+    //     articleService.create(article , file);
+    // }
+
+    public String articleStore(@ModelAttribute("article") Article article, RedirectAttributes redirectAttributes, Principal principal) {
+        articleService.create(article, principal);
         redirectAttributes.addFlashAttribute("successMessage", "Articolo aggiunto con successo!");
         return "redirect:/articles"; 
     }

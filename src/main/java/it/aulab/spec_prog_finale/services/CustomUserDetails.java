@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CustomUserDetails implements UserDetails{
     
+    private Long id;
     private String username;
     private String email;
     private String password;
@@ -50,6 +51,14 @@ public class CustomUserDetails implements UserDetails{
     @Override
     public String getUsername() {
         return email;
+    }
+    
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFullname() {

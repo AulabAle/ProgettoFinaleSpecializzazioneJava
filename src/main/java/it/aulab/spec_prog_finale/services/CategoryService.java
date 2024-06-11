@@ -1,5 +1,6 @@
 package it.aulab.spec_prog_finale.services;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,12 +38,6 @@ public class CategoryService implements CrudService<CategoryDto, Category, Long>
     }
     
     @Override
-    public CategoryDto create(Category model) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
-    }
-    
-    @Override
     public CategoryDto update(Long key, Category model) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'update'");
@@ -56,6 +51,12 @@ public class CategoryService implements CrudService<CategoryDto, Category, Long>
 
     @Override
     public CategoryDto create(Category model, MultipartFile file) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
+    }
+
+    @Override
+    public CategoryDto create(Category model, Principal principal) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'create'");
     }

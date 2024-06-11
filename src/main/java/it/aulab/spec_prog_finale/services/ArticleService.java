@@ -1,5 +1,6 @@
 package it.aulab.spec_prog_finale.services;
 
+import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -24,12 +25,24 @@ import it.aulab.spec_prog_finale.utils.StringManipulation;
 
 import org.springframework.http.*;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.security.core.Authentication;
+
+import it.aulab.spec_prog_finale.dtos.ArticleDto;
+import it.aulab.spec_prog_finale.models.Article;
+import it.aulab.spec_prog_finale.models.User;
+import it.aulab.spec_prog_finale.repositories.ArticleRepository;
+import it.aulab.spec_prog_finale.repositories.UserRepository;
 
 @Service
 public class ArticleService implements CrudService<ArticleDto, Article, Long>{
 
     @Autowired
     private ArticleRepository articleRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -84,6 +97,16 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long>{
         return dto;
     }
 
+    public ArticleDto create(Article model, Principal principal) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null) {
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+            User user = (userRepository.findById(userDetails.getId())).get();
+            model.setUser(user);
+        }
+        return modelMapper.map(articleRepository.save(model), ArticleDto.class);
+    }
+
     @Override
     public ArticleDto update(Long key, Article model) {
         // TODO Auto-generated method stub
@@ -126,13 +149,4 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long>{
 
         return url;
     }
-
-    //Necessario per completare il crud repository ma da non implementare
-    @Override
-    public ArticleDto create(Article model) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'create'");
-    }
-
-
 }
