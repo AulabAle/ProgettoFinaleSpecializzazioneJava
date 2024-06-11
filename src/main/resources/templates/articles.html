@@ -20,6 +20,7 @@
                                 <th>Id</th>
                                 <th>Title</th>
                                 <th>Subtitle</th>
+                                <th>#Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -27,6 +28,11 @@
                                 <td th:text="${article.id}"></td>
                                 <td th:text="${article.title}"></td>
                                 <td th:text="${article.subtitle}"></td>
+                                <td>
+                                    <a th:href="@{/articles/detail/{id}(id=${article.id})}" class="btn btn-primary m-2">
+                                        <i class="fa-solid fa-bars"></i>
+                                    </a>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

@@ -1,5 +1,7 @@
 package it.aulab.spec_prog_finale.models;
 
+import java.util.ArrayList;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -9,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -41,4 +44,8 @@ public class Article {
     @ManyToOne
     @JsonIgnoreProperties({"articles"})
     private Category category;
+
+    @OneToOne(mappedBy = "article")
+    @JsonIgnoreProperties({"article"})
+    private Image image;
 }

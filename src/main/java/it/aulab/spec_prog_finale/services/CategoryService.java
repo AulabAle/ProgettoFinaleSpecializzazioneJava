@@ -6,6 +6,7 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import it.aulab.spec_prog_finale.dtos.CategoryDto;
 import it.aulab.spec_prog_finale.models.Category;
@@ -51,6 +52,12 @@ public class CategoryService implements CrudService<CategoryDto, Category, Long>
     public void delete(Long key) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'delete'");
+    }
+
+    @Override
+    public CategoryDto create(Category model, MultipartFile file) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'create'");
     }
     
 }

@@ -1,6 +1,7 @@
 package it.aulab.spec_prog_finale.dtos;
 
 import it.aulab.spec_prog_finale.models.Category;
+import it.aulab.spec_prog_finale.models.Image;
 import it.aulab.spec_prog_finale.models.User;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,4 +18,5 @@ public class ArticleDto {
     private String publishDate;
     private User user;
     private Category category;
+    private Image image;
 }

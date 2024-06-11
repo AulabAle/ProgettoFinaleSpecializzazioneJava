@@ -14,7 +14,7 @@
             </div>
 
             <div class="col-12 my-5">
-                <form th:action="@{/articles}" method="POST" th:object="${article}">
+                <form th:action="@{/articles}" method="POST" th:object="${article}" enctype="multipart/form-data">
                     <div class="row mb-3">
                         <div class="col">
                             <label for="articleTitle" class="form-label">Titolo</label>
@@ -45,6 +45,11 @@
                             <option th:each="category:${categories}" th:value="${category.id}"
                                 th:text="${category.name}"></option>
                         </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="image" class="form-label">Image</label>
+                        <input type="file" name="file" id="image" class="form-control"/>
                     </div>
 
                     <button type="submit" class="btn btn-success">Crea articolo</button>
