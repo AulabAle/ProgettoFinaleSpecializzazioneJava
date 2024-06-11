@@ -1,6 +1,9 @@
 package it.aulab.spec_prog_finale.controllers;
 
 import java.security.Principal;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,8 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
+import it.aulab.spec_prog_finale.dtos.ArticleDto;
 import it.aulab.spec_prog_finale.dtos.UserDto;
 import it.aulab.spec_prog_finale.models.User;
+import it.aulab.spec_prog_finale.services.ArticleService;
 import it.aulab.spec_prog_finale.services.CustomUserDetails;
 import it.aulab.spec_prog_finale.services.CustomUserDetailsService;
 import it.aulab.spec_prog_finale.services.UserService;
@@ -25,6 +30,9 @@ public class UserController {
     
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    private ArticleService articleService;
     
     @GetMapping("/")
     public String home(Model model, Principal principal) {
@@ -34,6 +42,9 @@ public class UserController {
         }else{
             model.addAttribute("userdetail", null);
         }
+        List<ArticleDto> articles = articleService.readAll();
+        Collections.sort(articles, Comparator.comparing(ArticleDto::getPublishDate).reversed());
+        model.addAttribute("articles", articles);
         return "home";
     }
     
