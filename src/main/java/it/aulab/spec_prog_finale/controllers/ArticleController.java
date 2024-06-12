@@ -67,4 +67,5 @@ public class ArticleController {
         viewModel.addAttribute("article", articleService.read(id));
         return "articleDetail";
     }
+
 }

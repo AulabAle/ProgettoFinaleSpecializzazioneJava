@@ -18,7 +18,9 @@ import org.springframework.web.server.ResponseStatusException;
 
 import it.aulab.spec_prog_finale.dtos.ArticleDto;
 import it.aulab.spec_prog_finale.models.Article;
+import it.aulab.spec_prog_finale.models.Category;
 import it.aulab.spec_prog_finale.models.Image;
+import it.aulab.spec_prog_finale.models.User;
 import it.aulab.spec_prog_finale.repositories.ArticleRepository;
 import it.aulab.spec_prog_finale.repositories.ImageRepository;
 import it.aulab.spec_prog_finale.utils.StringManipulation;
@@ -28,7 +30,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
 
-import it.aulab.spec_prog_finale.models.User;
 import it.aulab.spec_prog_finale.repositories.UserRepository;
 
 @Service
@@ -141,4 +142,21 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long>{
 
         return url;
     }
+
+    public List<ArticleDto> searchByCategory(Category category){
+        List<ArticleDto> dtos = new ArrayList<ArticleDto>();
+        for(Article article: articleRepository.findByCategory(category)){
+            dtos.add(modelMapper.map(article, ArticleDto.class));
+        }
+        return dtos;
+    }
+
+    public List<ArticleDto> searchByAuthor(User user){
+        List<ArticleDto> dtos = new ArrayList<ArticleDto>();
+        for(Article article: articleRepository.findByUser(user)){
+            dtos.add(modelMapper.map(article, ArticleDto.class));
+        }
+        return dtos;
+    }
+
 }

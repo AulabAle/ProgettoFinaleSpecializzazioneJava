@@ -6,17 +6,22 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
 import it.aulab.spec_prog_finale.dtos.ArticleDto;
 import it.aulab.spec_prog_finale.dtos.UserDto;
+import it.aulab.spec_prog_finale.models.Article;
+import it.aulab.spec_prog_finale.models.Category;
 import it.aulab.spec_prog_finale.models.User;
-import it.aulab.spec_prog_finale.services.ArticleService;
+import it.aulab.spec_prog_finale.repositories.UserRepository;
+import it.aulab.spec_prog_finale.services.CrudService;
 import it.aulab.spec_prog_finale.services.CustomUserDetails;
 import it.aulab.spec_prog_finale.services.CustomUserDetailsService;
 import it.aulab.spec_prog_finale.services.UserService;
@@ -32,7 +37,11 @@ public class UserController {
     private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
-    private ArticleService articleService;
+    @Qualifier("articleService")
+    CrudService<ArticleDto,Article,Long> articleService;
+
+    @Autowired
+    private UserRepository userRepository;
     
     @GetMapping("/")
     public String home(Model model, Principal principal) {
@@ -79,5 +88,14 @@ public class UserController {
 
         userService.saveUser(userDto);
         return "redirect:/register?success";
+    }
+
+    @GetMapping("/search/{id}")
+    public String articlesSearch(@PathVariable("id") Long id, Model viewModel) {
+        User user = userRepository.findById(id).get();
+        viewModel.addAttribute("title", "Tutti gli articoli trovati per utente " + user.getUsername());
+        List<ArticleDto> articles = articleService.searchByAuthor(user);
+        viewModel.addAttribute("articles", articles);
+        return "articles";
     }
 }
