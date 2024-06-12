@@ -18,7 +18,7 @@
                         <div class="carousel-inner">
                             <div class="carousel-item active">
                                 <img th:if="${article.image != null}" th:src="${article.image.path}" class="card-img-top" alt="...">
-                                <img th:unless="${article.image != null}" src="/default.jpg" class="card-img-top" alt="...">
+                                <img th:unless="${article.image != null}" th:src="@{/images/default.jpg}" class="card-img-top" alt="...">
                             </div>
                             <!-- <div th:each="image, iterStat : ${article.images}" th:if="${iterStat.index > 0}">
                                 <div class="carousel-item">
