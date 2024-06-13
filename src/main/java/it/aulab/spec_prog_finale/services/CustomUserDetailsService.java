@@ -44,7 +44,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             .collect(Collectors.toList());
         }
         else{
-            mapRoles = Arrays.asList(new SimpleGrantedAuthority("user"));
+            mapRoles = Arrays.asList(new SimpleGrantedAuthority("ROLE_USER"));
         }
         return mapRoles;
     }
