@@ -1,10 +1,12 @@
 package it.aulab.spec_prog_finale.controllers;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -21,6 +23,7 @@ import it.aulab.spec_prog_finale.dtos.ArticleDto;
 import it.aulab.spec_prog_finale.dtos.CategoryDto;
 import it.aulab.spec_prog_finale.models.Article;
 import it.aulab.spec_prog_finale.models.Category;
+import it.aulab.spec_prog_finale.repositories.ArticleRepository;
 import it.aulab.spec_prog_finale.services.CrudService;
 
 @Controller
@@ -35,11 +38,20 @@ public class ArticleController {
     @Qualifier("articleService")
     CrudService<ArticleDto,Article,Long> articleService;
 
+    @Autowired
+    ArticleRepository articleRepository;
+
+    @Autowired
+    ModelMapper modelMapper;
+
     @GetMapping
     public String articlesIndex(Model viewModel) {
         viewModel.addAttribute("title", "Tutti gli articoli");
         //viewModel.addAttribute("articles", articleService.readAll());
-        List<ArticleDto> articles = articleService.readAll();
+        List<ArticleDto> articles = new ArrayList<ArticleDto>();
+        for(Article article: articleRepository.findByIsAcceptedTrue()){
+            articles.add(modelMapper.map(article, ArticleDto.class));
+        }
         Collections.sort(articles, Comparator.comparing(ArticleDto::getPublishDate).reversed());
         viewModel.addAttribute("articles", articles);
         return "articles";
@@ -62,10 +74,33 @@ public class ArticleController {
     }
 
     @GetMapping("detail/{id}")
-    public String detailAuthorView(@PathVariable("id") Long id, Model viewModel) {
+    public String detailArticle(@PathVariable("id") Long id, Model viewModel) {
         viewModel.addAttribute("title", "Article detail");
         viewModel.addAttribute("article", articleService.read(id));
         return "articleDetail";
     }
 
+
+    @GetMapping("revisor/detail/{id}")
+    public String revisorDetailArticle(@PathVariable("id") Long id, Model viewModel) {
+        viewModel.addAttribute("title", "Article detail");
+        viewModel.addAttribute("article", articleService.read(id));
+        return "revisorCheckDetail";
+    }
+
+    @PostMapping("/accept/{action}/{articleId}")
+    public String articleSetAccepted(@PathVariable String action, @PathVariable Long articleId,  RedirectAttributes redirectAttributes) {
+        Article article = articleRepository.findById(articleId).get();
+        if(action.equals("yes")){
+            article.setIsAccepted(true);
+            redirectAttributes.addFlashAttribute("resultMessage", "Articolo accettato!");
+        }else if(action.equals("no")){
+            redirectAttributes.addFlashAttribute("resultMessage", "Articolo rifiutato!");
+        }else{
+            redirectAttributes.addFlashAttribute("resultMessage", "Azione non corretta!");
+        }
+        articleRepository.save(article);
+        
+        return "redirect:/revisor/dashboard"; 
+    }
 }

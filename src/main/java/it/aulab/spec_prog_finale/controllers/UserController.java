@@ -1,10 +1,12 @@
 package it.aulab.spec_prog_finale.controllers;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
@@ -18,9 +20,11 @@ import org.springframework.validation.BindingResult;
 import it.aulab.spec_prog_finale.dtos.ArticleDto;
 import it.aulab.spec_prog_finale.dtos.UserDto;
 import it.aulab.spec_prog_finale.models.Article;
-import it.aulab.spec_prog_finale.models.Category;
 import it.aulab.spec_prog_finale.models.User;
+import it.aulab.spec_prog_finale.repositories.ArticleRepository;
+import it.aulab.spec_prog_finale.repositories.CarreerRequestRepository;
 import it.aulab.spec_prog_finale.repositories.UserRepository;
+import it.aulab.spec_prog_finale.services.CategoryService;
 import it.aulab.spec_prog_finale.services.CrudService;
 import it.aulab.spec_prog_finale.services.CustomUserDetails;
 import it.aulab.spec_prog_finale.services.CustomUserDetailsService;
@@ -42,6 +46,18 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private CarreerRequestRepository carreerRequestRepository;
+
+    @Autowired
+    ArticleRepository articleRepository;
+
+    @Autowired
+    ModelMapper modelMapper;
+
+    @Autowired
+    CategoryService categoryService;
     
     @GetMapping("/")
     public String home(Model model, Principal principal) {
@@ -51,7 +67,12 @@ public class UserController {
         }else{
             model.addAttribute("userdetail", null);
         }
-        List<ArticleDto> articles = articleService.readAll();
+
+        List<ArticleDto> articles = new ArrayList<ArticleDto>();
+        for(Article article: articleRepository.findByIsAcceptedTrue()){
+            articles.add(modelMapper.map(article, ArticleDto.class));
+        }
+
         Collections.sort(articles, Comparator.comparing(ArticleDto::getPublishDate).reversed());
         model.addAttribute("articles", articles);
         return "home";
@@ -98,4 +119,20 @@ public class UserController {
         viewModel.addAttribute("articles", articles);
         return "articles";
     }
+
+    @GetMapping("/admin/dashboard")
+    public String adminDashboard(Model viewModel) {
+        viewModel.addAttribute("title", "Richieste ricevute");
+        viewModel.addAttribute("requests", carreerRequestRepository.findByIsCheckedFalse());
+        viewModel.addAttribute("categories", categoryService.readAll());
+        return "adminDashboard";
+    }
+
+    @GetMapping("/revisor/dashboard")
+    public String ravisorDashboard(Model viewModel) {
+        viewModel.addAttribute("title", "Articoli da revisionare");
+        viewModel.addAttribute("articles", articleRepository.findByIsAcceptedFalse());
+        return "revisorDashboard";
+    }
+
 }

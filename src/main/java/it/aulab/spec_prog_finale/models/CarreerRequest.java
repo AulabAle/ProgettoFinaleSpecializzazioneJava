@@ -1,14 +1,11 @@
 package it.aulab.spec_prog_finale.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import lombok.Getter;
@@ -19,32 +16,22 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Entity
-@Table(name = "articles")
-public class Article {
+@Table(name = "carreer_request")
+public class CarreerRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    @Column(nullable = false, length = 100)
-    private String title;
-    @Column(nullable = false, length = 100)
-    private String subtitle;
     @Column(nullable = false, length = 1000)
     private String body;
-    @Column(nullable = true, length = 8)
-    private String publishDate;
-    @Column(nullable = true)
-    private Boolean isAccepted;
+    @Column
+    private Boolean isChecked;
     
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties({"articles"})
     private User user;
 
-    @ManyToOne
-    @JsonIgnoreProperties({"articles"})
-    private Category category;
+    @OneToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
 
-    @OneToOne(mappedBy = "article")
-    @JsonIgnoreProperties({"article"})
-    private Image image;
 }

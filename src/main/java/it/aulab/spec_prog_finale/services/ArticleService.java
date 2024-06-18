@@ -94,6 +94,9 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long>{
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+        model.setIsAccepted(false);
+
         ArticleDto dto = modelMapper.map(articleRepository.save(model), ArticleDto.class);
         urlImage = urlImage.replace(supabaseBucket, supabaseImage);
         imageRepository.save(Image.builder().path(urlImage).article(model).build());

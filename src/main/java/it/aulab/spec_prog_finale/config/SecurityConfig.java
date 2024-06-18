@@ -12,10 +12,9 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import it.aulab.spec_prog_finale.services.CustomUserDetailsService;
 
-
 @Configuration
 @EnableWebSecurity
-public class SecurityConfig {
+public class SecurityConfig{
     
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
@@ -30,6 +29,8 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests((authorize) ->
             authorize.requestMatchers("/register/**").permitAll()
+            .requestMatchers("/admin/dashboard").hasRole("ADMIN")
+            .requestMatchers("/revisor/dashboard").hasRole("REVISOR")
             .requestMatchers("/", "/articles", "/articles/detail/**", "/images/**").permitAll()
             .anyRequest().authenticated()
         ).formLogin(form ->

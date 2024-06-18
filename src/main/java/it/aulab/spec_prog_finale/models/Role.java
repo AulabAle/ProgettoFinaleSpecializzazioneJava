@@ -19,6 +19,7 @@ public class Role {
     private Long id;
     @Column(nullable = false, unique = true)
     private String name;
+    
     @ManyToMany(mappedBy = "roles")
     private List<User> users;
 }
