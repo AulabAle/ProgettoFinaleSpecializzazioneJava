@@ -69,15 +69,21 @@ public class CategoryService implements CrudService<CategoryDto, Category, Long>
     }
 
     @Override
-    public List<ArticleDto> searchByCategory(Category category) {
+    public List<CategoryDto> searchByCategory(Category category) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'searchByCategory'");
     }
 
     @Override
-    public List<ArticleDto> searchByAuthor(User user) {
+    public List<CategoryDto> searchByAuthor(User user) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'searchByAuthor'");
+    }
+
+    @Override
+    public List<CategoryDto> search(String keyword) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'search'");
     }
     
 }
