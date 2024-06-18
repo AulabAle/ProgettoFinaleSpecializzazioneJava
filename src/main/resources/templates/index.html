@@ -45,7 +45,7 @@
             </ul>
           </li>
         </ul>
-        <div sec:authorize="isAuthenticated" th:text="'Benvenuto: ' + ${#authentication.principal.fullname}">Benvenuto</div>
+        <div sec:authorize="isAuthenticated" th:text="'Benvenuto: ' + ${#authentication.principal.fullname} + ' - ' + ${#authentication.principal.authorities[0].authority.replace('ROLE_', '')}">Benvenuto</div>
       </div>
     </div>
     <form class="d-flex" th:action="@{/articles/search}" method="get">

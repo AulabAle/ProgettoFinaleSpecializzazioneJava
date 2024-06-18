@@ -41,7 +41,7 @@ public class SecurityConfig{
         ).logout(logout -> logout
             .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
             .permitAll()
-        );
+        ).exceptionHandling(exception -> exception.accessDeniedPage("/error/403"));
         
         return http.build();
     }
