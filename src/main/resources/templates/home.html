@@ -6,6 +6,12 @@ xmlns:th="http://www.thymeleaf.org"
 <body>
     
     <head th:insert="~{index :: navbar}"></head>
+
+        <div th:if="${param.notAuthorized}">
+            <div class="alert alert-danger">
+                Not authorized!
+            </div>
+        </div>
     
         <div th:if="${successMessage}" class="alert alert-success">
             <p th:text="${successMessage}"></p>

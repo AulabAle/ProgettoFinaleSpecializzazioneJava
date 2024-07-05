@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import it.aulab.spec_prog_finale.dtos.ArticleDto;
@@ -19,6 +21,7 @@ import it.aulab.spec_prog_finale.models.Category;
 import it.aulab.spec_prog_finale.repositories.CategoryRepository;
 import it.aulab.spec_prog_finale.services.CategoryService;
 import it.aulab.spec_prog_finale.services.CrudService;
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/categories")
@@ -51,7 +54,14 @@ public class CategoryController {
     }
 
     @PostMapping
-    public String categoryStore(@ModelAttribute("category") Category category, RedirectAttributes redirectAttributes) {
+    public String categoryStore(@Valid @ModelAttribute("category") Category category, BindingResult result, RedirectAttributes redirectAttributes, Model viewModel) {
+
+        if (result.hasErrors()) {
+            viewModel.addAttribute("title", "Crea un categoria");
+            viewModel.addAttribute("category", category);
+            return "createCategory";
+        }
+
         categoryService.create(category, null, null);
         redirectAttributes.addFlashAttribute("successMessage", "Categoria aggiunta con successo!");
         return "redirect:/admin/dashboard"; 
@@ -65,8 +75,15 @@ public class CategoryController {
     }
 
     @PostMapping("/update/{id}")
-    public String categoryUpdate(@PathVariable("id")Long id, @ModelAttribute("category") Category category, RedirectAttributes redirectAttributes) {
-        categoryService.update(id, category);
+    public String categoryUpdate(@PathVariable("id")Long id, @Valid @ModelAttribute("category") Category category, BindingResult result, RedirectAttributes redirectAttributes, Model viewModel) {
+
+        if (result.hasErrors()) {
+            viewModel.addAttribute("title", "Modifca categoria");
+            viewModel.addAttribute("category", category);
+            return "updateCategory";
+        }
+
+        categoryService.update(id, category, null);
         redirectAttributes.addFlashAttribute("successMessage", "Categoria modificata con successo!");
         return "redirect:/admin/dashboard"; 
     }

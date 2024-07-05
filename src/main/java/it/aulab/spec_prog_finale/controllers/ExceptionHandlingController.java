@@ -17,12 +17,10 @@ public class ExceptionHandlingController {
 
     @GetMapping("/error/{number}")
     public String accessDenied(@PathVariable int number,Model model) {
-        model.addAttribute("title", "error");
         if(number == 403){
-            model.addAttribute("errorMessage", "Non sei atuorizzato!");
+            return "redirect:/?notAuthorized";
         }
-        model.addAttribute("articles", articleService.readAll());
-        return "home";
+        return "redirect:/";
     }
 
 }

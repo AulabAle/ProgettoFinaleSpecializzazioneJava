@@ -3,8 +3,6 @@ package it.aulab.spec_prog_finale.services;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -12,9 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import it.aulab.spec_prog_finale.dtos.ArticleDto;
 import it.aulab.spec_prog_finale.dtos.CategoryDto;
-import it.aulab.spec_prog_finale.models.Article;
 import it.aulab.spec_prog_finale.models.Category;
 import it.aulab.spec_prog_finale.models.User;
 import it.aulab.spec_prog_finale.repositories.CategoryRepository;
@@ -44,7 +40,7 @@ public class CategoryService implements CrudService<CategoryDto, Category, Long>
     }
     
     @Override
-    public CategoryDto update(Long key, Category model) {
+    public CategoryDto update(Long key, Category model, MultipartFile file) {
         if (categoryRepository.existsById(key)) {
             model.setId(key);
             return modelMapper.map(categoryRepository.save(model), CategoryDto.class) ;

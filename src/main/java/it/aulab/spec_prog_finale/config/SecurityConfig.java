@@ -31,6 +31,7 @@ public class SecurityConfig{
             authorize.requestMatchers("/register/**").permitAll()
             .requestMatchers("/admin/dashboard").hasRole("ADMIN")
             .requestMatchers("/revisor/dashboard").hasRole("REVISOR")
+            .requestMatchers("/writer/dashboard", "/articles/create").hasRole("WRITER")
             .requestMatchers("/", "/articles", "/articles/detail/**", "/images/**").permitAll()
             .anyRequest().authenticated()
         ).formLogin(form ->

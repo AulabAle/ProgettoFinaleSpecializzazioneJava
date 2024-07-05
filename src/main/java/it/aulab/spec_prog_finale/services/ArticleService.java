@@ -4,29 +4,19 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-
 import it.aulab.spec_prog_finale.dtos.ArticleDto;
 import it.aulab.spec_prog_finale.models.Article;
 import it.aulab.spec_prog_finale.models.Category;
-import it.aulab.spec_prog_finale.models.Image;
 import it.aulab.spec_prog_finale.models.User;
 import it.aulab.spec_prog_finale.repositories.ArticleRepository;
-import it.aulab.spec_prog_finale.repositories.ImageRepository;
-import it.aulab.spec_prog_finale.utils.StringManipulation;
-
 import org.springframework.http.*;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.Authentication;
 
@@ -45,21 +35,7 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long>{
     private ModelMapper modelMapper;
 
     @Autowired
-    private ImageRepository imageRepository;
-
-    @Value("${supabase.url}")
-    private String supabaseUrl;
-    
-    @Value("${supabase.key}")
-    private String supabaseKey;
-
-    @Value("${supabase.bucket}")
-    private String supabaseBucket;
-
-    @Value("${supabase.image}")
-    private String supabaseImage;
-
-    private final RestTemplate restTemplate = new RestTemplate();
+    private ImageService imageService;
 
     @Override
     public List<ArticleDto> readAll() {
@@ -81,7 +57,7 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long>{
     }
 
     public ArticleDto create(Article model, Principal principal, MultipartFile file) {
-        String urlImage="";
+        String url = "";
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
@@ -89,63 +65,83 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long>{
             model.setUser(user);
         }
 
-        try {
-            urlImage = uploadImage(file);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        model.setIsAccepted(false);
-
-        ArticleDto dto = modelMapper.map(articleRepository.save(model), ArticleDto.class);
-        urlImage = urlImage.replace(supabaseBucket, supabaseImage);
-        imageRepository.save(Image.builder().path(urlImage).article(model).build());
-        return dto;
-    }
-
-    @Override
-    public ArticleDto update(Long key, Article model) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'update'");
-    }
-
-    @Override
-    public void delete(Long key) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'delete'");
-    }
-    
-    @Async
-    public String uploadImage(MultipartFile file) throws Exception {
-        String url = "";
         if(!file.isEmpty()){
             try {
-                String nameFile = UUID.randomUUID().toString() + "_" + file.getOriginalFilename();
-
-                String extension = StringManipulation.getFileExtension(nameFile);
-
-                url = supabaseUrl + supabaseBucket  + nameFile;
-
-                MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-
-                body.add("file", file.getBytes());
-
-                HttpHeaders headers = new HttpHeaders();
-                headers.set("Content-Type","image/"+ extension);
-                headers.set("Authorization", "Bearer " + supabaseKey);
-
-                HttpEntity<byte[]> requestEntity = new HttpEntity<>(file.getBytes(), headers);
-
-                restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
-
+                CompletableFuture<String> futureUrl = imageService.saveImageOnCloud(file);
+                url = futureUrl.get();
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        return url;
+        model.setIsAccepted(false);
+
+        ArticleDto dto = modelMapper.map(articleRepository.save(model), ArticleDto.class);
+        if(!file.isEmpty()){
+            imageService.saveImageOnDB(url, model);
+        }
+        return dto;
     }
 
+    @Override
+    public ArticleDto update(Long key, Article model, MultipartFile file) {
+        String url="";
+        if (articleRepository.existsById(key)) {
+            model.setId(key);
+            Article article = articleRepository.findById(key).get();
+
+            model.setUser(article.getUser());
+            if(!file.isEmpty()){
+                try {
+                    imageService.deleteImage(article.getImage().getPath());
+                    try {
+                        CompletableFuture<String> futureUrl = imageService.saveImageOnCloud(file);
+                        url = futureUrl.get();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    imageService.saveImageOnDB(url, model);
+                    model.setIsAccepted(false);
+                    return modelMapper.map(articleRepository.save(model), ArticleDto.class);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }else{
+                
+                if(!model.equals(article)){
+                    model.setIsAccepted(false);
+                }else{
+                    model.setIsAccepted(article.getIsAccepted());
+                }
+
+                return modelMapper.map(articleRepository.save(model), ArticleDto.class) ;
+            }
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+        return null;
+    }
+
+    @Override
+    public void delete(Long key) {
+        if (articleRepository.existsById(key)) {
+
+            Article article = articleRepository.findById(key).get();
+
+            try {
+                imageService.deleteImage(article.getImage().getPath());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            article.getImage().setArticle(null);
+
+            articleRepository.deleteById(key);
+        } else {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
+    }
+    
     public List<ArticleDto> searchByCategory(Category category){
         List<ArticleDto> dtos = new ArrayList<ArticleDto>();
         for(Article article: articleRepository.findByCategory(category)){

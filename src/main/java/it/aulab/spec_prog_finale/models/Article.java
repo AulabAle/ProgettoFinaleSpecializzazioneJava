@@ -11,6 +11,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -25,10 +26,13 @@ public class Article {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @Column(nullable = false, length = 100)
+    @NotEmpty
     private String title;
     @Column(nullable = false, length = 100)
+    @NotEmpty
     private String subtitle;
     @Column(nullable = false, length = 1000)
+    @NotEmpty
     private String body;
     @Column(nullable = true, length = 8)
     private String publishDate;
@@ -47,4 +51,20 @@ public class Article {
     @OneToOne(mappedBy = "article")
     @JsonIgnoreProperties({"article"})
     private Image image;
+
+    @Override
+    public boolean equals(Object obj) {
+
+        Article article = (Article) obj;
+
+        if(title.equals(article.getTitle()) && 
+            subtitle.equals(article.getSubtitle()) && 
+            body.equals(article.getBody()) && 
+            publishDate.equals(article.getPublishDate()) && 
+            category.getName().equals(article.getCategory().getName())){
+            return true;
+        }
+
+        return false;
+    }
 }

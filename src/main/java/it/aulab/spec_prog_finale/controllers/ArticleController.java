@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,6 +27,7 @@ import it.aulab.spec_prog_finale.models.Article;
 import it.aulab.spec_prog_finale.models.Category;
 import it.aulab.spec_prog_finale.repositories.ArticleRepository;
 import it.aulab.spec_prog_finale.services.CrudService;
+import jakarta.validation.Valid;
 
 @Controller
 @RequestMapping("/articles")
@@ -68,11 +70,24 @@ public class ArticleController {
     }
 
     @PostMapping
-    public String articleStore(@ModelAttribute("article") Article article, RedirectAttributes redirectAttributes, Principal principal, MultipartFile file) {
-        articleService.create(article, principal, file);
-        redirectAttributes.addFlashAttribute("successMessage", "Articolo aggiunto con successo!");
-        return "redirect:/articles"; 
+    public String articleStore(@Valid @ModelAttribute("article") Article article, 
+                           BindingResult result, 
+                           RedirectAttributes redirectAttributes, 
+                           Principal principal, 
+                           MultipartFile file,
+                           Model viewModel) {
+
+    if (result.hasErrors()) {
+        viewModel.addAttribute("title", "Crea un articolo");
+        viewModel.addAttribute("article", article);
+        viewModel.addAttribute("categories", categoryService.readAll());
+        return "createArticle";
     }
+
+    articleService.create(article, principal, file);
+    redirectAttributes.addFlashAttribute("successMessage", "Articolo aggiunto con successo!");
+    return "redirect:/articles";
+}
 
     @GetMapping("detail/{id}")
     public String detailArticle(@PathVariable("id") Long id, Model viewModel) {
@@ -111,6 +126,40 @@ public class ArticleController {
         List<ArticleDto> articles = articleService.search(keyword);
         viewModel.addAttribute("articles", articles);
         return "articles";
+    }
+
+    @GetMapping("/edit/{id}")
+    public String editArticle(@PathVariable("id") Long id, Model viewModel) {
+        viewModel.addAttribute("title", "Article update");
+        viewModel.addAttribute("article", articleService.read(id));
+        viewModel.addAttribute("categories", categoryService.readAll());
+        return "articleEdit";
+    }
+
+    @PostMapping("/update/{id}")
+    public String articleUpdate(@PathVariable("id")Long id, @Valid @ModelAttribute("article") Article article, BindingResult result, RedirectAttributes redirectAttributes, Principal principal, MultipartFile file, Model viewModel) {
+
+        if (result.hasErrors()) {
+            viewModel.addAttribute("title", "Article update");
+            article.setImage(articleService.read(id).getImage());
+            viewModel.addAttribute("article", article);
+            viewModel.addAttribute("categories", categoryService.readAll());
+            return "articleEdit";
+        }
+
+        articleService.update(id, article, file);
+        redirectAttributes.addFlashAttribute("successMessage", "Articolo modificato con successo!");
+        return "redirect:/articles"; 
+    }
+
+
+    @GetMapping("/delete/{id}")
+    public String articleDelete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
+    
+        articleService.delete(id);
+        redirectAttributes.addFlashAttribute("successMessage", "Articolo cancellato con successo!");
+    
+        return "redirect:/writer/dashboard";
     }
 
 }

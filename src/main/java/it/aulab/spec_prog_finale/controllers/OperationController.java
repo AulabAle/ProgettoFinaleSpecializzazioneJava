@@ -1,14 +1,9 @@
 package it.aulab.spec_prog_finale.controllers;
 
 import java.security.Principal;
-import java.util.HashSet;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +19,6 @@ import it.aulab.spec_prog_finale.models.User;
 import it.aulab.spec_prog_finale.repositories.CarreerRequestRepository;
 import it.aulab.spec_prog_finale.repositories.RoleRepository;
 import it.aulab.spec_prog_finale.repositories.UserRepository;
-import it.aulab.spec_prog_finale.services.CustomUserDetails;
 import it.aulab.spec_prog_finale.services.CustomUserDetailsService;
 
 @Controller
