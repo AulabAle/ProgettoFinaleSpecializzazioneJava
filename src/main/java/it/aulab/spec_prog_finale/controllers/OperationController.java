@@ -62,7 +62,7 @@ public class OperationController {
         User user = userRepository.findByEmail(principal.getName());
 
         if(careerRequestService.isCareerRequestAlreadySubmitted(user, carrerRequest)){
-            redirectAttributes.addFlashAttribute("successMessage", "Richiesta già inviata per questo ruolo");
+            redirectAttributes.addFlashAttribute("errorMessage", "Richiesta già inviata per questo ruolo");
             return "redirect:/";
         }
 
