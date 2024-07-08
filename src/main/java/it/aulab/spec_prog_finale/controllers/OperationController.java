@@ -19,7 +19,9 @@ import it.aulab.spec_prog_finale.models.User;
 import it.aulab.spec_prog_finale.repositories.CarreerRequestRepository;
 import it.aulab.spec_prog_finale.repositories.RoleRepository;
 import it.aulab.spec_prog_finale.repositories.UserRepository;
+import it.aulab.spec_prog_finale.services.CareerRequestService;
 import it.aulab.spec_prog_finale.services.CustomUserDetailsService;
+import it.aulab.spec_prog_finale.services.EmailService;
 
 @Controller
 @RequestMapping("/operations")
@@ -37,6 +39,12 @@ public class OperationController {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    CareerRequestService careerRequestService;
+
     //Rotta per la creazione di un articolo
     @GetMapping("/carrer/request")
     public String carrerRequestCreate(Model viewModel) {
@@ -50,11 +58,21 @@ public class OperationController {
 
     @PostMapping("/carrer/request/save")
     public String carrerRequestStore(@ModelAttribute("carrerRequest") CarreerRequest carrerRequest, Principal principal, RedirectAttributes redirectAttributes) {
+
         User user = userRepository.findByEmail(principal.getName());
+
+        if(careerRequestService.isCareerRequestAlreadySubmitted(user, carrerRequest)){
+            redirectAttributes.addFlashAttribute("successMessage", "Richiesta già inviata per questo ruolo");
+            return "redirect:/";
+        }
+
         carrerRequest.setUser(user);
         carrerRequest.setIsChecked(false);
         carreerRequestRepository.save(carrerRequest);
         redirectAttributes.addFlashAttribute("successMessage", "Richiesta inviata con successo");
+
+        emailService.sendSimpleEmail("adminAulabpost@admin.com", "Richiesta per ruolo: " + carrerRequest.getRole().getName(), "C'è una nuova richiesta di collaborazione da parte di " + user.getUsername());
+
         return "redirect:/";
     }
 
@@ -78,6 +96,9 @@ public class OperationController {
         request.setIsChecked(true);
         carreerRequestRepository.save(request);
         redirectAttributes.addFlashAttribute("successMessage", "Ruolo abilitato per l'utente");
+
+        emailService.sendSimpleEmail( user.getEmail() , "Ruolo abilitato" ,"Ciao, la tua richiesta di collaborazione è stata accettata dalla nostra amministrazione");
+
         return "redirect:/admin/dashboard";
     }
 }

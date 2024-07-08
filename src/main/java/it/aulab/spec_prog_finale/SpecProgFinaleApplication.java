@@ -17,7 +17,7 @@ public class SpecProgFinaleApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(SpecProgFinaleApplication.class, args);
 	}
-	
+
 	@Bean
 	public PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();

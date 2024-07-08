@@ -53,5 +53,5 @@ public class SecurityConfig{
     throws Exception {
         auth.userDetailsService(customUserDetailsService)
         .passwordEncoder(passwordEncoder);
-    } 
+    }
 }
