@@ -9,11 +9,15 @@ import java.util.List;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 
@@ -29,6 +33,8 @@ import it.aulab.spec_prog_finale.services.CrudService;
 import it.aulab.spec_prog_finale.services.CustomUserDetails;
 import it.aulab.spec_prog_finale.services.CustomUserDetailsService;
 import it.aulab.spec_prog_finale.services.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 @Controller
@@ -61,7 +67,8 @@ public class UserController {
     
     @GetMapping("/")
     public String home(Model model, Principal principal) {
-        if(principal != null){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(principal != null || auth.getPrincipal() != "anonymousUser"){
             CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(principal.getName());
             model.addAttribute("userdetail", customUserDetails);
         }else{
@@ -93,7 +100,9 @@ public class UserController {
     @PostMapping("/register/save")
     public String registration(@Valid @ModelAttribute("user") UserDto userDto,
                                BindingResult result,
-                               Model model){
+                               Model model, 
+                               RedirectAttributes redirectAttributes,
+                               HttpServletRequest request, HttpServletResponse response){
 
         User existingUser = userService.findUserByEmail(userDto.getEmail());
 
@@ -107,8 +116,10 @@ public class UserController {
             return "/register";
         }
 
-        userService.saveUser(userDto);
-        return "redirect:/register?success";
+        userService.saveUser(userDto, redirectAttributes, request, response);
+
+        redirectAttributes.addFlashAttribute("successMessage", "Registrazione avvenuta!");
+        return "redirect:/";
     }
 
     @GetMapping("/search/{id}")

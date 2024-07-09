@@ -3,9 +3,12 @@ package it.aulab.spec_prog_finale.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -18,7 +21,6 @@ public class SecurityConfig{
     
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
-    
     
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -33,6 +35,7 @@ public class SecurityConfig{
             .requestMatchers("/revisor/dashboard").hasRole("REVISOR")
             .requestMatchers("/writer/dashboard", "/articles/create").hasRole("WRITER")
             .requestMatchers("/", "/articles", "/articles/detail/**", "/images/**").permitAll()
+            .requestMatchers("/register").permitAll()
             .anyRequest().authenticated()
         ).formLogin(form ->
             form.loginPage("/login")
@@ -42,8 +45,15 @@ public class SecurityConfig{
         ).logout(logout -> logout
             .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
             .permitAll()
-        ).exceptionHandling(exception -> exception.accessDeniedPage("/error/403"));
-        
+        ).exceptionHandling(exception -> exception.accessDeniedPage("/error/403"))
+        .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // Configura la gestione delle sessioni
+                // .invalidSessionUrl("/login?invalid-session=true") // URL da reindirizzare in caso di sessione non valida
+                .maximumSessions(1) // Numero massimo di sessioni per utente
+                .expiredUrl("/login?session-expired=true") // URL da reindirizzare in caso di sessione scaduta
+            );
+;
+
         return http.build();
     }
     
@@ -54,4 +64,10 @@ public class SecurityConfig{
         auth.userDetailsService(customUserDetailsService)
         .passwordEncoder(passwordEncoder);
     }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
+
 }

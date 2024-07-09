@@ -11,9 +11,9 @@ import it.aulab.spec_prog_finale.models.CarreerRequest;
 public interface CarreerRequestRepository extends CrudRepository<CarreerRequest, Long>{
     List<CarreerRequest> findByIsCheckedFalse();
 
-    @Query(value = "SELECT user_id FROM carreer_request", nativeQuery = true)
+    @Query(value = "SELECT user_id FROM users_roles", nativeQuery = true)
     List<Long> findAllUserIds();
 
-    @Query(value = "SELECT * FROM carreer_request WHERE user_id = :id ", nativeQuery = true)
-    List<CarreerRequest> findByUserId(@Param("id") Long id);
+    @Query(value = "SELECT role_id FROM users_roles WHERE user_id = :id ", nativeQuery = true)
+    List<Long> findByUserId(@Param("id") Long id);
 }

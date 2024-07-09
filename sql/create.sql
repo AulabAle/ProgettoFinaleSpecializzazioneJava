@@ -37,6 +37,7 @@ create table images(
 );
 
 CREATE TABLE users_roles (
+    id BIGINT auto_increment PRIMARY KEY,
     user_id BIGINT,
     role_id BIGINT,
     FOREIGN KEY (user_id) REFERENCES users(id),

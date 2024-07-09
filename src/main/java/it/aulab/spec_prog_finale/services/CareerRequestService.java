@@ -24,11 +24,9 @@ public class CareerRequestService {
             return false;
         }
 
-        List<CarreerRequest> requests = careerRequestRepository.findByUserId(user.getId());
+        List<Long> requests = careerRequestRepository.findByUserId(user.getId());
 
-        return requests.stream()
-                       .map(req -> req.getRole().getId())
-                       .anyMatch(roleId -> roleId.equals(careerRequest.getRole().getId()));
+        return requests.stream().anyMatch(roleId -> roleId.equals(careerRequest.getRole().getId()));
     }
 }
 
