@@ -1,5 +1,7 @@
 package it.aulab.spec_prog_finale.models;
 
+import java.time.LocalDate;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import jakarta.persistence.Column;
@@ -35,7 +37,7 @@ public class Article {
     @NotEmpty
     private String body;
     @Column(nullable = true, length = 8)
-    private String publishDate;
+    private LocalDate publishDate;
     @Column(nullable = true)
     private Boolean isAccepted;
     
