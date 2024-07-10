@@ -47,16 +47,12 @@ public class SecurityConfig{
             .permitAll()
         ).exceptionHandling(exception -> exception.accessDeniedPage("/error/403"))
         .sessionManagement(session -> session
-                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED) // Configura la gestione delle sessioni
-                // .invalidSessionUrl("/login?invalid-session=true") // URL da reindirizzare in caso di sessione non valida
-                .maximumSessions(1) // Numero massimo di sessioni per utente
-                .expiredUrl("/login?session-expired=true") // URL da reindirizzare in caso di sessione scaduta
+                .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED)
+                .maximumSessions(1)
+                .expiredUrl("/login?session-expired=true")
             );
-;
-
         return http.build();
     }
-    
     
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) 

@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import it.aulab.spec_prog_finale.dtos.CategoryDto;
+import it.aulab.spec_prog_finale.models.Article;
 import it.aulab.spec_prog_finale.models.Category;
 import it.aulab.spec_prog_finale.models.User;
 import it.aulab.spec_prog_finale.repositories.CategoryRepository;
@@ -53,6 +54,16 @@ public class CategoryService implements CrudService<CategoryDto, Category, Long>
     @Transactional
     public void delete(Long id) {
         if (categoryRepository.existsById(id)) {
+
+            Category category = categoryRepository.findById(id).get();
+
+            if (category.getArticles() != null) {
+                Iterable<Article> articles = category.getArticles();
+                for (Article article: articles) {
+                    article.setCategory(null);
+                }
+            }
+
             categoryRepository.deleteById(id);
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);

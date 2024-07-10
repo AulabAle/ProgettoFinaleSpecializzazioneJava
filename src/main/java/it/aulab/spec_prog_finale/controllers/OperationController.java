@@ -53,7 +53,7 @@ public class OperationController {
         List<Role> roles = roleRepository.findAll();
         roles.removeIf(e -> e.getName().equals("ROLE_USER"));  
         viewModel.addAttribute("roles", roles);
-        return "careerRequestForm";
+        return "carrer/requestForm";
     }
 
     @PostMapping("/carrer/request/save")
@@ -80,7 +80,7 @@ public class OperationController {
     public String carrerRequestDetail(@PathVariable("id") Long id, Model viewModel) {
         viewModel.addAttribute("title", "Dettaglio richiesta");
         viewModel.addAttribute("request", carreerRequestRepository.findById(id).get());
-        return "careerRequestDetail";
+        return "carrer/requestDetail";
     }
 
     @PostMapping("/carrer/request/accept/{requestId}")

@@ -25,9 +25,9 @@ public class NotificationInterceptor implements HandlerInterceptor {
                            ModelAndView modelAndView) throws Exception {
         if (modelAndView != null) {
             int revisedCount = articleRepository.findByIsAcceptedFalse().size();
-            int carreerCount = carreerRequestRepository.findByIsCheckedFalse().size();
+            int carrerCount = carreerRequestRepository.findByIsCheckedFalse().size();
             modelAndView.addObject("articlesToBeRevised", revisedCount);
-            modelAndView.addObject("carreerRequests", carreerCount);
+            modelAndView.addObject("carrerRequests", carrerCount);
         }
     }
 }

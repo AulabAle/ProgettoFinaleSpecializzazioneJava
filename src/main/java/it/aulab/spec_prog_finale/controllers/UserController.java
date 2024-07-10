@@ -89,12 +89,12 @@ public class UserController {
     public String register(Model model) {
         // create model object to store form data
         model.addAttribute("user", new UserDto());
-        return "register";
+        return "auth/register";
     }
     
     @GetMapping("/login")
     public String login() {
-        return "login";
+        return "auth/login";
     }
     
     @PostMapping("/register/save")
@@ -113,7 +113,7 @@ public class UserController {
 
         if (result.hasErrors()) {
             model.addAttribute("user", userDto);
-            return "/register";
+            return "auth/register";
         }
 
         userService.saveUser(userDto, redirectAttributes, request, response);
@@ -128,7 +128,7 @@ public class UserController {
         viewModel.addAttribute("title", "Tutti gli articoli trovati per utente " + user.getUsername());
         List<ArticleDto> articles = articleService.searchByAuthor(user);
         viewModel.addAttribute("articles", articles);
-        return "articles";
+        return "article/articles";
     }
 
     @GetMapping("/admin/dashboard")
@@ -136,14 +136,14 @@ public class UserController {
         viewModel.addAttribute("title", "Richieste ricevute");
         viewModel.addAttribute("requests", carreerRequestRepository.findByIsCheckedFalse());
         viewModel.addAttribute("categories", categoryService.readAll());
-        return "adminDashboard";
+        return "admin/dashboard";
     }
 
     @GetMapping("/revisor/dashboard")
     public String ravisorDashboard(Model viewModel) {
         viewModel.addAttribute("title", "Articoli da revisionare");
         viewModel.addAttribute("articles", articleRepository.findByIsAcceptedFalse());
-        return "revisorDashboard";
+        return "revisor/dashboard";
     }
 
     @GetMapping("/writer/dashboard")
@@ -154,7 +154,7 @@ public class UserController {
                                                       .filter(article -> article.getUser().getEmail().equals(principal.getName()))
                                                       .toList();
         viewModel.addAttribute("articles", userArticles);
-        return "writerDashboard";
+        return "writer/dashboard";
     }
 
 }
