@@ -1,20 +1,14 @@
 package it.aulab.spec_prog_finale.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-import it.aulab.spec_prog_finale.services.ArticleService;
-
-
 @Controller
 public class ExceptionHandlingController {
 
-    @Autowired
-    ArticleService articleService;
-
+    //Rotta per la gestione e cattura di errori
     @GetMapping("/error/{number}")
     public String accessDenied(@PathVariable int number,Model model) {
         if(number == 403){

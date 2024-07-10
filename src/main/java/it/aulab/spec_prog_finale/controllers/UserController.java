@@ -10,7 +10,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,7 +47,7 @@ public class UserController {
 
     @Autowired
     @Qualifier("articleService")
-    CrudService<ArticleDto,Article,Long> articleService;
+    private CrudService<ArticleDto,Article,Long> articleService;
 
     @Autowired
     private UserRepository userRepository;
@@ -57,17 +56,20 @@ public class UserController {
     private CarreerRequestRepository carreerRequestRepository;
 
     @Autowired
-    ArticleRepository articleRepository;
+    private ArticleRepository articleRepository;
 
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
 
     @Autowired
-    CategoryService categoryService;
+    private CategoryService categoryService;
     
+    //Rotta di home
     @GetMapping("/")
     public String home(Model model, Principal principal) {
+        //Recupero il contesto di autenticazione per la verifica di avvenuto login o register
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
         if(principal != null || auth.getPrincipal() != "anonymousUser"){
             CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(principal.getName());
             model.addAttribute("userdetail", customUserDetails);
@@ -75,28 +77,33 @@ public class UserController {
             model.addAttribute("userdetail", null);
         }
 
+        //Recupero tutti gli articoli accettati
         List<ArticleDto> articles = new ArrayList<ArticleDto>();
         for(Article article: articleRepository.findByIsAcceptedTrue()){
             articles.add(modelMapper.map(article, ArticleDto.class));
         }
 
+        //ordino e invio al template gli articoli ordinati in modo decrescente
         Collections.sort(articles, Comparator.comparing(ArticleDto::getPublishDate).reversed());
         model.addAttribute("articles", articles);
+
         return "home";
     }
     
+    //Rotta per la registrazione
     @GetMapping("/register")
     public String register(Model model) {
-        // create model object to store form data
         model.addAttribute("user", new UserDto());
         return "auth/register";
     }
     
+    //Rotta per la login
     @GetMapping("/login")
     public String login() {
         return "auth/login";
     }
     
+    //Rotta per il salvataggio della registrazione
     @PostMapping("/register/save")
     public String registration(@Valid @ModelAttribute("user") UserDto userDto,
                                BindingResult result,
@@ -119,18 +126,23 @@ public class UserController {
         userService.saveUser(userDto, redirectAttributes, request, response);
 
         redirectAttributes.addFlashAttribute("successMessage", "Registrazione avvenuta!");
+
         return "redirect:/";
     }
 
+    //Rotta per la ricerca degli articoli in base all'utente
     @GetMapping("/search/{id}")
-    public String articlesSearch(@PathVariable("id") Long id, Model viewModel) {
+    public String userArticlesSearch(@PathVariable("id") Long id, Model viewModel) {
         User user = userRepository.findById(id).get();
         viewModel.addAttribute("title", "Tutti gli articoli trovati per utente " + user.getUsername());
+
         List<ArticleDto> articles = articleService.searchByAuthor(user);
         viewModel.addAttribute("articles", articles);
+
         return "article/articles";
     }
 
+    //Rotta per la dashboard dell'admin
     @GetMapping("/admin/dashboard")
     public String adminDashboard(Model viewModel) {
         viewModel.addAttribute("title", "Richieste ricevute");
@@ -139,6 +151,7 @@ public class UserController {
         return "admin/dashboard";
     }
 
+    //Rotta per la dashboard del revisor
     @GetMapping("/revisor/dashboard")
     public String ravisorDashboard(Model viewModel) {
         viewModel.addAttribute("title", "Articoli da revisionare");
@@ -146,6 +159,7 @@ public class UserController {
         return "revisor/dashboard";
     }
 
+    //Rotta per la dashboard del writer
     @GetMapping("/writer/dashboard")
     public String writerDashboard(Model viewModel , Principal principal) {
         viewModel.addAttribute("title", "I tuoi articoli");
@@ -153,7 +167,9 @@ public class UserController {
                                                       .stream()
                                                       .filter(article -> article.getUser().getEmail().equals(principal.getName()))
                                                       .toList();
+
         viewModel.addAttribute("articles", userArticles);
+        
         return "writer/dashboard";
     }
 

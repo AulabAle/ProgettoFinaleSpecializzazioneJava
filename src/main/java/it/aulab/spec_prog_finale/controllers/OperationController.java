@@ -20,62 +20,56 @@ import it.aulab.spec_prog_finale.repositories.CarreerRequestRepository;
 import it.aulab.spec_prog_finale.repositories.RoleRepository;
 import it.aulab.spec_prog_finale.repositories.UserRepository;
 import it.aulab.spec_prog_finale.services.CareerRequestService;
-import it.aulab.spec_prog_finale.services.CustomUserDetailsService;
-import it.aulab.spec_prog_finale.services.EmailService;
 
 @Controller
 @RequestMapping("/operations")
 public class OperationController {
 
     @Autowired
-    CustomUserDetailsService customUserDetailsService;
+    private CarreerRequestRepository carreerRequestRepository;
 
     @Autowired
-    CarreerRequestRepository carreerRequestRepository;
+    private RoleRepository roleRepository;
 
     @Autowired
-    RoleRepository roleRepository;
+    private UserRepository userRepository;
 
     @Autowired
-    UserRepository userRepository;
+    private CareerRequestService careerRequestService;
 
-    @Autowired
-    private EmailService emailService;
-
-    @Autowired
-    CareerRequestService careerRequestService;
-
-    //Rotta per la creazione di un articolo
+    //Rotta per la creazione di una richiesta di collaborazione
     @GetMapping("/carrer/request")
     public String carrerRequestCreate(Model viewModel) {
         viewModel.addAttribute("title", "Inserisci la tua richiesta");
         viewModel.addAttribute("carrerRequest", new CarreerRequest());
+
         List<Role> roles = roleRepository.findAll();
+        //Elimino la possibilità di scegliere il ruolo user nella select del form
         roles.removeIf(e -> e.getName().equals("ROLE_USER"));  
         viewModel.addAttribute("roles", roles);
+
         return "carrer/requestForm";
     }
 
+    //Rotta per il salvataggio di una richiesta di ruolo
     @PostMapping("/carrer/request/save")
     public String carrerRequestStore(@ModelAttribute("carrerRequest") CarreerRequest carrerRequest, Principal principal, RedirectAttributes redirectAttributes) {
 
         User user = userRepository.findByEmail(principal.getName());
 
-        if(careerRequestService.isCareerRequestAlreadySubmitted(user, carrerRequest)){
-            redirectAttributes.addFlashAttribute("errorMessage", "Richiesta già inviata per questo ruolo");
+        if(careerRequestService.isRoleAlreadyAssigned(user, carrerRequest)){
+            redirectAttributes.addFlashAttribute("errorMessage", "Sei già assegnato a questo ruolo");
             return "redirect:/";
         }
 
-        carrerRequest.setUser(user);
-        carrerRequest.setIsChecked(false);
-        carreerRequestRepository.save(carrerRequest);
-        redirectAttributes.addFlashAttribute("successMessage", "Richiesta inviata con successo");
+        careerRequestService.save(carrerRequest, user);
 
-        emailService.sendSimpleEmail("adminAulabpost@admin.com", "Richiesta per ruolo: " + carrerRequest.getRole().getName(), "C'è una nuova richiesta di collaborazione da parte di " + user.getUsername());
+        redirectAttributes.addFlashAttribute("successMessage", "Richiesta inviata con successo");
 
         return "redirect:/";
     }
 
+    //Rotta per il dettaglio di una richiesta
     @GetMapping("/carrer/request/detail/{id}")
     public String carrerRequestDetail(@PathVariable("id") Long id, Model viewModel) {
         viewModel.addAttribute("title", "Dettaglio richiesta");
@@ -83,21 +77,12 @@ public class OperationController {
         return "carrer/requestDetail";
     }
 
+    //Rotta per l'accettazione di una richiesta
     @PostMapping("/carrer/request/accept/{requestId}")
     public String carrerRequestAccept(@PathVariable Long requestId, RedirectAttributes redirectAttributes) {
-        CarreerRequest request = carreerRequestRepository.findById(requestId).get();
-        User user = request.getUser();
-        Role role = request.getRole();
-        List<Role> rolesUser = user.getRoles();
-        Role newRole = roleRepository.findByName(role.getName());
-        rolesUser.add(newRole);
-        user.setRoles(rolesUser);
-        userRepository.save(user);
-        request.setIsChecked(true);
-        carreerRequestRepository.save(request);
+        
+        careerRequestService.carrerAccept(requestId);
         redirectAttributes.addFlashAttribute("successMessage", "Ruolo abilitato per l'utente");
-
-        emailService.sendSimpleEmail( user.getEmail() , "Ruolo abilitato" ,"Ciao, la tua richiesta di collaborazione è stata accettata dalla nostra amministrazione");
 
         return "redirect:/admin/dashboard";
     }

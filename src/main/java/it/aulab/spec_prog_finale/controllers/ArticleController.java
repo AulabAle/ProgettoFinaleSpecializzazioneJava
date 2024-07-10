@@ -35,17 +35,17 @@ public class ArticleController {
     
     @Autowired
     @Qualifier("categoryService")
-    CrudService<CategoryDto,Category,Long> categoryService;
+    private CrudService<CategoryDto,Category,Long> categoryService;
     
     @Autowired
     @Qualifier("articleService")
-    CrudService<ArticleDto,Article,Long> articleService;
+    private CrudService<ArticleDto,Article,Long> articleService;
     
     @Autowired
-    ArticleRepository articleRepository;
+    private ArticleRepository articleRepository;
     
     @Autowired
-    ModelMapper modelMapper;
+    private ModelMapper modelMapper;
     
     //Rotta index degli articoli
     @GetMapping

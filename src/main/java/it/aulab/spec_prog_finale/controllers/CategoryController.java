@@ -28,14 +28,15 @@ public class CategoryController {
 
     @Autowired
     @Qualifier("articleService")
-    CrudService<ArticleDto,Article,Long> articleService;
+    private CrudService<ArticleDto,Article,Long> articleService;
 
     @Autowired
-    CategoryRepository categoryRepository;
+    private CategoryRepository categoryRepository;
 
     @Autowired
-    CategoryService categoryService;
+    private CategoryService categoryService;
     
+    //Rotta per la ricerca dell'articolo in base alla categoria
     @GetMapping("/search/{id}")
     public String categorySearch(@PathVariable("id") Long id, Model viewModel) {
         Category category = categoryRepository.findById(id).get();
@@ -47,6 +48,7 @@ public class CategoryController {
         return "article/articles";
     }
 
+    //Rotta per la creazione di una categoria
     @GetMapping("create")
     public String categoryCreate(Model viewModel) {
         viewModel.addAttribute("title", "Crea un categoria");
@@ -54,6 +56,7 @@ public class CategoryController {
         return "category/create";
     }
 
+    //Rotta per la memorizzazione di una categoria
     @PostMapping
     public String categoryStore(@Valid @ModelAttribute("category") Category category, 
                                 BindingResult result, 
@@ -73,6 +76,7 @@ public class CategoryController {
         return "redirect:/admin/dashboard"; 
     }
 
+    //Rotta per la modifica di una categoria
     @GetMapping("/edit/{id}")
     public String categoryDetail(@PathVariable("id") Long id, Model viewModel) {
         viewModel.addAttribute("title", "Modifca categoria");
@@ -80,6 +84,7 @@ public class CategoryController {
         return "category/update";
     }
 
+    //Rotta per la memorizzazione delle modifiche di una categoria
     @PostMapping("/update/{id}")
     public String categoryUpdate(@PathVariable("id")Long id, 
                                 @Valid @ModelAttribute("category") Category category, 
@@ -100,6 +105,7 @@ public class CategoryController {
         return "redirect:/admin/dashboard"; 
     }
 
+    //Rotta per la cancellazione di una categoria
     @GetMapping("delete/{id}")
     public String categoryDelete(@PathVariable("id") Long id, RedirectAttributes redirectAttributes) {
     
