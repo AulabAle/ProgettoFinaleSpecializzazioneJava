@@ -14,6 +14,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -29,12 +30,15 @@ public class Article {
     private Long id;
     @Column(nullable = false, length = 100)
     @NotEmpty
+    @Size(max = 100)
     private String title;
     @Column(nullable = false, length = 100)
     @NotEmpty
+    @Size(max = 100)
     private String subtitle;
     @Column(nullable = false, length = 1000)
     @NotEmpty
+    @Size(max = 1000)
     private String body;
     @Column(nullable = true, length = 8)
     private LocalDate publishDate;

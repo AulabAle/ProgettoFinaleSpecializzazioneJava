@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:insert="~{index :: head}">
+</head>
+<body>
+    <head th:insert="~{index :: navbar}"></head>
+
+    <div class="d-flex vh-100 justify-content-center align-items-center">
+        <div class="bg-light m-5 p-5 rounded">
+            <div>
+                <h1>Server Error</h1>
+                <p th:text="${error}"></p>
+                <p th:text="${message}"></p>
+                <p th:text="${url}"></p>
+                <p th:text="'Status code: ' + ${status}"></p>
+            </div>
+        </div>
+    </div>
+
+    <head th:insert="~{index :: footer}"></head>
+    <script th:replace="~{index :: bootstrapScript}"></script>
+</body>
+</html>

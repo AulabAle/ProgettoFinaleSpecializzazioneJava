@@ -61,12 +61,17 @@
                 <p th:text="${article.body}"></p>
                 
                 <div class="text-center">
-                    <a th:href="@{/articles}" class="text-secondary">Vai alla lista degli articoli</a>
+                    <a class="text-secondary" onclick="goBack()">Torna indietro</a>
                 </div>
             </div>
         </div>
 
 <head th:insert="~{index :: footer}"></head>
 <script th:replace="~{index :: bootstrapScript}"></script>
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
 </body>
 </html>
