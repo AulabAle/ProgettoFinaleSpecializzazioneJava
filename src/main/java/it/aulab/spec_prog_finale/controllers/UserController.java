@@ -27,6 +27,7 @@ import it.aulab.spec_prog_finale.models.User;
 import it.aulab.spec_prog_finale.repositories.ArticleRepository;
 import it.aulab.spec_prog_finale.repositories.CarreerRequestRepository;
 import it.aulab.spec_prog_finale.repositories.UserRepository;
+import it.aulab.spec_prog_finale.services.ArticleService;
 import it.aulab.spec_prog_finale.services.CategoryService;
 import it.aulab.spec_prog_finale.services.CrudService;
 import it.aulab.spec_prog_finale.services.CustomUserDetails;
@@ -46,8 +47,7 @@ public class UserController {
     private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
-    @Qualifier("articleService")
-    private CrudService<ArticleDto,Article,Long> articleService;
+    private ArticleService articleService;
 
     @Autowired
     private UserRepository userRepository;

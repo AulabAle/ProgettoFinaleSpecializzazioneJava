@@ -26,6 +26,7 @@ import it.aulab.spec_prog_finale.dtos.CategoryDto;
 import it.aulab.spec_prog_finale.models.Article;
 import it.aulab.spec_prog_finale.models.Category;
 import it.aulab.spec_prog_finale.repositories.ArticleRepository;
+import it.aulab.spec_prog_finale.services.ArticleService;
 import it.aulab.spec_prog_finale.services.CrudService;
 import jakarta.validation.Valid;
 
@@ -38,8 +39,7 @@ public class ArticleController {
     private CrudService<CategoryDto,Category,Long> categoryService;
     
     @Autowired
-    @Qualifier("articleService")
-    private CrudService<ArticleDto,Article,Long> articleService;
+    private ArticleService articleService;
     
     @Autowired
     private ArticleRepository articleRepository;

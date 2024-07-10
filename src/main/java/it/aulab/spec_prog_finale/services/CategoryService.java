@@ -13,7 +13,6 @@ import org.springframework.web.server.ResponseStatusException;
 import it.aulab.spec_prog_finale.dtos.CategoryDto;
 import it.aulab.spec_prog_finale.models.Article;
 import it.aulab.spec_prog_finale.models.Category;
-import it.aulab.spec_prog_finale.models.User;
 import it.aulab.spec_prog_finale.repositories.CategoryRepository;
 import jakarta.transaction.Transactional;
 
@@ -73,24 +72,6 @@ public class CategoryService implements CrudService<CategoryDto, Category, Long>
     @Override
     public CategoryDto create(Category model, Principal principal, MultipartFile file) {
         return modelMapper.map(categoryRepository.save(model), CategoryDto.class);
-    }
-
-    @Override
-    public List<CategoryDto> searchByCategory(Category category) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'searchByCategory'");
-    }
-
-    @Override
-    public List<CategoryDto> searchByAuthor(User user) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'searchByAuthor'");
-    }
-
-    @Override
-    public List<CategoryDto> search(String keyword) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'search'");
     }
     
 }

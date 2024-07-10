@@ -56,13 +56,14 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long>{
         }
     }
 
-    public ArticleDto create(Article model, Principal principal, MultipartFile file) {
+    public ArticleDto create(Article article, Principal principal, MultipartFile file) {
         String url = "";
+        
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
             User user = (userRepository.findById(userDetails.getId())).get();
-            model.setUser(user);
+            article.setUser(user);
         }
 
         if(!file.isEmpty()){
@@ -74,47 +75,59 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long>{
             }
         }
 
-        model.setIsAccepted(false);
+        article.setIsAccepted(false);
 
-        ArticleDto dto = modelMapper.map(articleRepository.save(model), ArticleDto.class);
+        ArticleDto dto = modelMapper.map(articleRepository.save(article), ArticleDto.class);
         if(!file.isEmpty()){
-            imageService.saveImageOnDB(url, model);
+            imageService.saveImageOnDB(url, article);
         }
+
         return dto;
     }
 
     @Override
-    public ArticleDto update(Long key, Article model, MultipartFile file) {
+    public ArticleDto update(Long key, Article updatedArticle, MultipartFile file) {
         String url="";
-        if (articleRepository.existsById(key)) {
-            model.setId(key);
-            Article article = articleRepository.findById(key).get();
 
-            model.setUser(article.getUser());
+        //Controllo l'esistenza dell'articolo in base al suo id
+        if (articleRepository.existsById(key)) {
+            //Assegno all'articolo proveniente dal form lo stesso id dell'articolo originale
+            updatedArticle.setId(key);
+            //Recupero l'articolo originale non modificato
+            Article article = articleRepository.findById(key).get();
+            //Imposto l'utente dell'articolo del form con l'utente dell'articolo originale
+            updatedArticle.setUser(article.getUser());
+
+            //Faccio un controllo sulla presenza o meno del file nell'articolo del form quindi capisco se devo modificare o meno l'immagine
             if(!file.isEmpty()){
                 try {
+                    //Elimino l'immagine precedente
                     imageService.deleteImage(article.getImage().getPath());
                     try {
+                        //Salvo la nuova immagine
                         CompletableFuture<String> futureUrl = imageService.saveImageOnCloud(file);
                         url = futureUrl.get();
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
-                    imageService.saveImageOnDB(url, model);
-                    model.setIsAccepted(false);
-                    return modelMapper.map(articleRepository.save(model), ArticleDto.class);
+                    //Salvo il nuovo path nel db
+                    imageService.saveImageOnDB(url, updatedArticle);
+
+                    //Essendo l'immagine modificata l'articolo torna in revisione
+                    updatedArticle.setIsAccepted(false);
+                    return modelMapper.map(articleRepository.save(updatedArticle), ArticleDto.class);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }else{
-                
-                if(!model.equals(article)){
-                    model.setIsAccepted(false);
+                //Se l'immagine non è stata modificata devo fare un check su tutti gli altri campi se diversi l'articolo torna in revisione
+                if(!updatedArticle.equals(article)){
+                    updatedArticle.setIsAccepted(false);
                 }else{
-                    model.setIsAccepted(article.getIsAccepted());
+                    updatedArticle.setIsAccepted(article.getIsAccepted());
                 }
 
-                return modelMapper.map(articleRepository.save(model), ArticleDto.class) ;
+                return modelMapper.map(articleRepository.save(updatedArticle), ArticleDto.class) ;
             }
         } else {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
@@ -129,12 +142,12 @@ public class ArticleService implements CrudService<ArticleDto, Article, Long>{
             Article article = articleRepository.findById(key).get();
 
             try {
-                imageService.deleteImage(article.getImage().getPath());
+                String path = article.getImage().getPath();
+                article.getImage().setArticle(null);
+                imageService.deleteImage(path);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            article.getImage().setArticle(null);
 
             articleRepository.deleteById(key);
         } else {

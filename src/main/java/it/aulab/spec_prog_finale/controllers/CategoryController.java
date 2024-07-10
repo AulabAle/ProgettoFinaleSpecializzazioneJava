@@ -3,7 +3,6 @@ package it.aulab.spec_prog_finale.controllers;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,11 +14,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import it.aulab.spec_prog_finale.dtos.ArticleDto;
-import it.aulab.spec_prog_finale.models.Article;
 import it.aulab.spec_prog_finale.models.Category;
 import it.aulab.spec_prog_finale.repositories.CategoryRepository;
+import it.aulab.spec_prog_finale.services.ArticleService;
 import it.aulab.spec_prog_finale.services.CategoryService;
-import it.aulab.spec_prog_finale.services.CrudService;
 import jakarta.validation.Valid;
 
 @Controller
@@ -27,8 +25,7 @@ import jakarta.validation.Valid;
 public class CategoryController {
 
     @Autowired
-    @Qualifier("articleService")
-    private CrudService<ArticleDto,Article,Long> articleService;
+    private ArticleService articleService;
 
     @Autowired
     private CategoryRepository categoryRepository;
