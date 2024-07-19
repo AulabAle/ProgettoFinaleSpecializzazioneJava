@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -29,7 +29,6 @@ import it.aulab.spec_prog_finale.repositories.CarreerRequestRepository;
 import it.aulab.spec_prog_finale.repositories.UserRepository;
 import it.aulab.spec_prog_finale.services.ArticleService;
 import it.aulab.spec_prog_finale.services.CategoryService;
-import it.aulab.spec_prog_finale.services.CrudService;
 import it.aulab.spec_prog_finale.services.CustomUserDetails;
 import it.aulab.spec_prog_finale.services.CustomUserDetailsService;
 import it.aulab.spec_prog_finale.services.UserService;
@@ -64,19 +63,34 @@ public class UserController {
     @Autowired
     private CategoryService categoryService;
     
+    // @GetMapping("/")
+    // public String home(Model model, Principal principal) {
+    //     //Recupero il contesto di autenticazione per la verifica di avvenuto login o register
+    //     Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+
+    //     if(principal != null || auth.getPrincipal() != "anonymousUser"){
+    //         CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(principal.getName());
+    //         model.addAttribute("userdetail", customUserDetails);
+    //     }else{
+    //         model.addAttribute("userdetail", null);
+    //     }
+
+    //     //Recupero tutti gli articoli accettati
+    //     List<ArticleDto> articles = new ArrayList<ArticleDto>();
+    //     for(Article article: articleRepository.findByIsAcceptedTrue()){
+    //         articles.add(modelMapper.map(article, ArticleDto.class));
+    //     }
+
+    //     //ordino e invio al template gli articoli ordinati in modo decrescente
+    //     Collections.sort(articles, Comparator.comparing(ArticleDto::getPublishDate).reversed());
+    //     model.addAttribute("articles", articles);
+
+    //     return "home";
+    // }
+
     //Rotta di home
     @GetMapping("/")
-    public String home(Model model, Principal principal) {
-        //Recupero il contesto di autenticazione per la verifica di avvenuto login o register
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-
-        if(principal != null || auth.getPrincipal() != "anonymousUser"){
-            CustomUserDetails customUserDetails = customUserDetailsService.loadUserByUsername(principal.getName());
-            model.addAttribute("userdetail", customUserDetails);
-        }else{
-            model.addAttribute("userdetail", null);
-        }
-
+    public String home(Model model) {
         //Recupero tutti gli articoli accettati
         List<ArticleDto> articles = new ArrayList<ArticleDto>();
         for(Article article: articleRepository.findByIsAcceptedTrue()){
@@ -85,7 +99,10 @@ public class UserController {
 
         //ordino e invio al template gli articoli ordinati in modo decrescente
         Collections.sort(articles, Comparator.comparing(ArticleDto::getPublishDate).reversed());
-        model.addAttribute("articles", articles);
+
+        List<ArticleDto> lastThreeArticles = articles.stream().limit(3).collect(Collectors.toList());
+
+        model.addAttribute("articles", lastThreeArticles);
 
         return "home";
     }

@@ -8,4 +8,3 @@ public interface CareerRequestService {
     void save(CarreerRequest carrerRequest, User user);
     void carrerAccept(Long requestId);
 }
-

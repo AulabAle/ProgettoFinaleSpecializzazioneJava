@@ -29,13 +29,6 @@ CREATE TABLE articles (
     FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
-create table images(
-    id BIGINT auto_increment PRIMARY KEY,
-    path VARCHAR(255) not null,
-    article_id BIGINT,
-    FOREIGN KEY (article_id) REFERENCES articles(id)
-);
-
 CREATE TABLE users_roles (
     id BIGINT auto_increment PRIMARY KEY,
     user_id BIGINT,
